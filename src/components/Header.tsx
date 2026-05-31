@@ -1,8 +1,10 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Shield } from 'lucide-react'
+import { useVaultContract } from '@/hooks/useVault'
 import { motion } from 'framer-motion'
 
 export default function Header() {
+  const { isConnected, nexBalanceNum, useMock } = useVaultContract()
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -31,7 +33,9 @@ export default function Header() {
               <span className="text-xs text-slate-400">Hardhat Local</span>
             </div>
           </div>
-
+          {isConnected && !useMock && (
+              <span className="text-xs text-gold mono mr-3">{nexBalanceNum.toFixed(2)} NEX</span>
+            )}
           <ConnectButton showBalance={false} accountStatus="address" chainStatus="icon" />
         </div>
       </div>

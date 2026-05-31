@@ -9,7 +9,9 @@ import Erc20Abi from '@/abi/ERC20.json'
 
 const typedNexusVaultAbi = NexusVaultAbi as readonly unknown[] as any
 const typedErc20Abi = Erc20Abi as readonly unknown[] as any
-
+export function getBoostTier(nexBalance: number) {
+  return { multiplier: 1.0, label: 'None' }
+}
 export interface TxRecord {
   id: string
   type: 'faucet' | 'approve' | 'stake' | 'unstake' | 'harvest'
@@ -69,7 +71,11 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const [mockRewards, setMockRewards] = useState<Record<string, number>>({ WETH: 0, USDC: 0, DAI: 0, WBTC: 0 })
   const [mockApproved, setMockApproved] = useState<Record<string, boolean>>({ WETH: true, USDC: true, DAI: true, WBTC: true })
   const rewardTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
+  const { data: nexBalanceRaw } = useReadContract({
+    address: CONTRACTS.nexToken, abi: typedErc20Abi, functionName: 'balanceOf', args: [userAddress],
+    query: { enabled: isConnected && !!userAddress && chainId === 31337, refetchInterval: 5000 },
+  })
+  const nexBalanceNum = useMock ? 0 : Number(formatUnits((nexBalanceRaw as bigint) || 0n, 18))
   const isHardhat = chainId === 31337
 
   useEffect(() => { setUseMock(!isConnected || !isHardhat) }, [isConnected, isHardhat])
@@ -270,8 +276,8 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     <VaultContext.Provider value={{
       pools, userPoolInfos, totalTvl, totalPendingReward, totalStakedValue,
       poolLength: useMock ? 4 : Number(poolLength || 0),
-      isConnected, userAddress, txState, useMock, isHardhat, txHistory,
-      approveToken, deposit, withdraw, harvest, faucet, resetTxState,
+      isConnected, userAddress, txState, useMock, isHardhat, txHistory, nexBalanceNum,
+      approveToken, deposit, withdraw, harvest, faucet, resetTxState, 
     }}>
       {children}
     </VaultContext.Provider>
