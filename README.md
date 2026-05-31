@@ -51,7 +51,7 @@ NexusVault is a **complete full-stack DeFi yield farming protocol** built from s
 
 ## Screenshots
 
-> _Add your own screenshots here after running the app_
+> screenshots here after running the app_
 
 | Dashboard | Staking Modal | Governance |
 |-----------|--------------|------------|
